@@ -1,0 +1,5 @@
+---
+- hosts: nginx_hosts
+  remote_user: root
+  roles:
+   - {role: nginx_install}

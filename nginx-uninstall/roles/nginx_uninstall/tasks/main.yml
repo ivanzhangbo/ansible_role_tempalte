@@ -1,0 +1,5 @@
+- name: stop nginx and delete file
+  shell: rm -rf /usr/lib/systemd/system/nginx.service;rm -rf /usr/local/nginx/;rm -rf /usr/local/src/*.*;userdel nginx
+  notify: stop nginx
+  
+  

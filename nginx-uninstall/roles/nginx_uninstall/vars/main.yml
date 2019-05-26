@@ -1,0 +1,3 @@
+ngxport: "80"
+server_name: "zbhome"
+root_dir: "/web"

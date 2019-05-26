@@ -1,0 +1,18 @@
+<html>
+<head>
+    <style type="text/css">
+        .container{
+            width: 80%;
+            height: 80%;
+            background-color: aquamarine;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<p2>IP:{{ ansible_default_ipv4.address }}</p2>
+<p2>OS:{{ ansible_distribution}}</p2>
+<p2>hostname:{{ ansible_nodename }}</p2>
+</div>
+</body>
+</html>
