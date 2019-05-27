@@ -1,0 +1,49 @@
+- name: install mysql repository
+  yum:
+   state: present
+   name: http://dev.mysql.com/get/mysql57-community-release-el7-7.noarch.rpm
+
+- name: install necessary libraries
+  yum:
+   state: present
+   name: "{{item}}"
+  with_items:
+    - yum-utils
+    - MySQL-python
+    - mysql-community-server
+
+- name: deploy changed .my.cnf
+  template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+
+- name: running mysqld
+  service:
+   name: mysqld
+   state: started
+   enabled: yes
+
+- name: chack root login
+  shell: mysql -uroot -pany_password
+  register: root_login_result
+  ignore_errors: True
+
+- name: get temporary password
+  shell: cat /var/log/mysqld.log | grep "temporary password" | awk '{print $NF}'
+  register: mysql_default_password
+  when: root_login_result.rc != 0
+
+- name: change root user password for updating expiration date
+  shell: |
+   mysql -u root -p'{{ mysql_default_password.stdout }}' --connect-expired-password -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'Do_You_Love_MySQL5.7?';"
+  when: root_login_result.rc != 0
+
+- name: uninstall validate_password
+  shell: |
+   mysql -u root -p"Do_You_Love_MySQL5.7?" --connect-expired-password -e "uninstall plugin validate_password;"
+  when: root_login_result.rc != 0
+
+- name: change root user password
+  shell: |
+   mysql -u root -p'Do_You_Love_MySQL5.7?' --connect-expired-password -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '{{init_pwd}}';" # 任意のパスワード
+  when: root_login_result.rc != 0
